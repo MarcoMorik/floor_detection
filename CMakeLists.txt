@@ -18,3 +18,7 @@ include_directories(
 
 add_executable(pcl_snapshot src/pcl_snapshot.cpp)
 target_link_libraries(pcl_snapshot ${catkin_LIBRARIES})
+add_executable(floor_detection src/floor_detection.cpp)
+target_link_libraries(floor_detection ${catkin_LIBRARIES})
+add_executable(pcl_file_publisher src/pcl_file_publisher.cpp)
+target_link_libraries(pcl_file_publisher ${catkin_LIBRARIES})
