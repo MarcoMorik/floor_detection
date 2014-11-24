@@ -16,7 +16,7 @@ typedef pcl::PCLPointCloud2 Cloud2;
 class floorDetection {
 public:
     floorDetection() {
-        pcl_sub_ = nh_.subscribe("/filepub/pcl", 1, &floorDetection::detectFloor, this);
+        pcl_sub_ = nh_.subscribe("/snapshot/pcl", 1, &floorDetection::detectFloor, this);
         floor_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/floor_detection/floor", 1);
     }
 
@@ -44,7 +44,7 @@ public:
         transform_.setOrigin(tf::Vector3(0.0, 0.0, coefficients.values[3]));
         q_.setRPY(-angle, 0, 0);
         transform_.setRotation(q_);
-        tb_.sendTransform(tf::StampedTransform(transform_, ros::Time::now(), "world", "floor"));
+        tb_.sendTransform(tf::StampedTransform(transform_, ros::Time::now(), "robot_center", "camera_rgb_optical"));
 
         //Publish pointcloud of floor, not really necessary other than for debugging
         Cloud result(*input, inliers.indices);
