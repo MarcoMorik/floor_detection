@@ -18,6 +18,7 @@ public:
     floorDetection() {
         pcl_sub_ = nh_.subscribe("/snapshot/pcl", 1, &floorDetection::detectFloor, this);
         floor_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("/floor_detection/floor", 1);
+        calculated = false;
     }
 
     void detectFloor(const sensor_msgs::PointCloud2ConstPtr& pclMsg) {
@@ -40,11 +41,11 @@ public:
         floorNormal.normalize();
         double angle = std::acos(floorNormal.z());
 
-        //Broadcast the tranform
+        //Set the tranform
         transform_.setOrigin(tf::Vector3(0.0, 0.0, coefficients.values[3]));
         q_.setRPY(-angle, 0, 0);
         transform_.setRotation(q_);
-        tb_.sendTransform(tf::StampedTransform(transform_, ros::Time::now(), "robot_center", "camera_rgb_optical"));
+        calculated = true;
 
         //Publish pointcloud of floor, not really necessary other than for debugging
         Cloud result(*input, inliers.indices);
@@ -59,6 +60,12 @@ public:
         floor_pub_.publish(msgOut);
     }
 
+    void publishTransform() {
+        if(calculated == true) {
+            tb_.sendTransform(tf::StampedTransform(transform_, ros::Time::now(), "robot_center", "/camera_rgb_optical_frame"));
+        }
+    }
+
 private:
     ros::NodeHandle nh_;
     ros::Subscriber pcl_sub_;
@@ -66,10 +73,16 @@ private:
     tf::TransformBroadcaster tb_;
     tf::Transform transform_;
     tf::Quaternion q_;
+    bool calculated;
 };
 
 int main(int argc, char** argv) {
     ros::init(argc, argv, "floor_detection");
     floorDetection fd;
-    ros::spin();
+    ros::Rate rate(10);
+    while(ros::ok()) {
+        ros::spinOnce();
+        fd.publishTransform();
+        rate.sleep();
+    }
 }
