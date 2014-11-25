@@ -62,7 +62,7 @@ public:
 
     void publishTransform() {
         if(calculated == true) {
-            tb_.sendTransform(tf::StampedTransform(transform_, ros::Time::now(), "robot_center", "/camera_rgb_optical_frame"));
+            tb_.sendTransform(tf::StampedTransform(transform_, ros::Time::now(), "/camera_rgb_optical_frame", "robot_center"));
         }
     }
 

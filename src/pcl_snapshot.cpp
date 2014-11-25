@@ -63,7 +63,7 @@ public:
             return;
         }
         sensor_msgs::PointCloud2 msgOut;
-        input.header.frame_id = "floor";
+        input.header.frame_id = "/camera_rgb_optical_frame";
         pcl::toROSMsg(input, msgOut);
         pcl_pub_.publish(msgOut);
         std::cout << "File published" << std::endl;
